@@ -1,14 +1,18 @@
 from textnode import TextType, TextNode
-from htmlnode import HTMLNode
+from htmlnode import HTMLNode, LeafNode
 
-print("hello world")
+#print("hello world")
 
 def main():
-    test_txt_node = TextNode("This is a text node", TextType.BOLD, "https://www.boot.dev")
+    #test_txt_node = TextNode("This is a text node", TextType.BOLD, "https://www.boot.dev")
     #print(test_txt_node)
-    prop = {"href": "https://www.google.com","target": "_blank",}
-    htmlnode = HTMLNode( None,None ,None , prop )
-    print(htmlnode)
+    #prop = {"href": "https://www.google.com","target": "_blank",}
+    #htmlnode = HTMLNode( None,None ,None , prop )
+    #print(htmlnode)
+    node = LeafNode("p", "This is a paragraph of text.")
+    node2 = LeafNode("a", "Click me!", {"href": "https://www.google.com"})
+    print(node.to_html())
+    print(node2.to_html())
         
 
 main()
