@@ -27,10 +27,11 @@ class LeafNode(HTMLNode):
         super().__init__(tag, value, None, props)
     def to_html(self):
         if self.value is None:
-            raise ValueError("Leafnodes requires a value - None found")
+            raise ValueError("invalid HTML: no value")
         if self.tag is None:
             return str(self.value)
-        return "<"+ self.tag + self.props_to_html()+">"+self.value+"</"+self.tag+">" 
+        return "<"+ self.tag + self.props_to_html()+">"+self.value+"</"+self.tag+">"
+        #prob should have used : f"<{self.tag}{self.props_to_html()}>{self.value}</{self.tag}>"
     
     def __repr__(self):
         return "<"+ self.tag + self.props_to_html()+">"+self.value+"</"+self.tag+">" 
