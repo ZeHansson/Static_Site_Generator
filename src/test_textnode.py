@@ -40,7 +40,7 @@ class TestTextNode(unittest.TestCase):
 
     def test_not_eq_ALL(self):
         node = TextNode("This is a FAT text node", TextType.BOLD)
-        node2 = TextNode("This is a text node", TextType.NORMAL, "https://www.boot.dev")
+        node2 = TextNode("This is a text node", TextType.TEXT, "https://www.boot.dev")
 
 if __name__ == "__main__":
     unittest.main()
