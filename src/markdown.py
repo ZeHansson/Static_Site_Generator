@@ -11,10 +11,12 @@ def extract_markdown_links(text):
 def use_regex(pattern, text):
     return re.findall(pattern,text)
 
-
 def split_nodes_delimiter(old_nodes, delimiter, text_type):
+    return split_nodes(old_nodes, delimiter,text_type)
+
+def split_nodes(nodes, delimiter, text_type):
     new_nodes = []
-    for old_node in old_nodes:
+    for old_node in nodes:
         if old_node.text_type != TextType.TEXT:
             new_nodes.append(old_node)
             continue
@@ -32,7 +34,54 @@ def split_nodes_delimiter(old_nodes, delimiter, text_type):
         new_nodes.extend(split_nodes)
     return new_nodes
 
+def split_link_nodes(nodes, text_type):
+    is_image = text_type is TextType.IMAGE
+    is_link = text_type is TextType.LINK
+    new_nodes = []
+    for old_node in nodes:
+        # Skip non-text nodes
+        if old_node.text_type != TextType.TEXT:
+            new_nodes.append(old_node)
+            continue
+        matches = []
+        if is_image:
+            matches = extract_markdown_images(old_node.text)
+        elif is_link: 
+            matches = extract_markdown_links(old_node.text)
 
+        if not matches:
+            new_nodes.append(old_node)
+            continue
+
+        current_text = old_node.text
+        for alt_text, url in matches:
+            if is_image:
+                markdown = f"![{alt_text}]({url})"
+            else:
+                markdown = f"[{alt_text}]({url})"
+
+            parts = current_text.split(markdown, 1)
+            if parts[0]:
+                new_nodes.append(TextNode(parts[0], TextType.TEXT))
+                
+            new_nodes.append(TextNode(alt_text, text_type, url))
+
+            if len(parts) > 1:
+                current_text = parts[1]
+            else:
+                current_text = ""
+        if current_text:
+            new_nodes.append(TextNode(current_text, TextType.TEXT))
+            
+    return new_nodes
+
+
+def split_nodes_image(old_nodes):
+    return split_link_nodes(old_nodes, TextType.IMAGE)
+    
+
+def split_nodes_link(old_nodes):
+    return split_link_nodes(old_nodes, TextType.LINK)
 
 #def split_nodes_delimiter(old_nodes, delimiter, text_type):
 #    newnodes = []
