@@ -1,6 +1,7 @@
 from textnode import TextType, TextNode
 from htmlnode import HTMLNode, LeafNode
 from markdown import *
+from markdown_blocks import markdown_to_blocks
 
 #print("hello world")
 
@@ -19,10 +20,12 @@ def main():
     #node = TextNode("This is text with a link [to boot dev](https://www.boot.dev) and [to youtube](https://www.youtube.com/@bootdotdev)", TextType.TEXT,)
     #print(split_nodes_link([node]))
     
-    nodes = text_to_textnodes("This is **text** with an _italic_ word and a `code block` and an ![obi wan image](https://i.imgur.com/fJRm4Vk.jpeg) and a [link](https://boot.dev)")
+    #nodes = text_to_textnodes("This is **text** with an _italic_ word and a `code block` and an ![obi wan image](https://i.imgur.com/fJRm4Vk.jpeg) and a [link](https://boot.dev)")
     #for node in nodes:
     #    print(node)
-    print(nodes)
+    #print(nodes)
+
+    print(markdown_to_blocks("   \n\n# This is a heading \n\nThis is a paragraph of text. It has some **bold** and _italic_ words inside of it.\n\n - This is the first list item in a list block\n- This is a list item\n- This is another list item     "))
 
         
 
