@@ -1,7 +1,7 @@
-from textnode import TextType, TextNode
-from htmlnode import HTMLNode, LeafNode
-from markdown import *
-from markdown_blocks import markdown_to_blocks
+from page_generator import generate_page
+
+import os
+import shutil
 
 #print("hello world")
 
@@ -24,8 +24,48 @@ def main():
     #for node in nodes:
     #    print(node)
     #print(nodes)
+    
 
-    print(markdown_to_blocks("   \n\n# This is a heading \n\nThis is a paragraph of text. It has some **bold** and _italic_ words inside of it.\n\n - This is the first list item in a list block\n- This is a list item\n- This is another list item     "))
+    #copy_and_overwrite("static", "public")
+
+    
+    copy_and_overwrite("./static", "./public")
+    from_dir = "./content"
+    template_path = "./template.html"
+    dest_dir = "./public"
+
+
+    generate_page(os.path.join(from_dir, "index.md"), template_path, os.path.join(dest_dir, "index.html"))
+    
+def copy_and_overwrite(from_path, to_path):
+    if os.path.exists(to_path):
+        shutil.rmtree(to_path)
+    shutil.copytree(from_path, to_path)
+
+# def generate_page(from_path, template_path, dest_path):
+#     print(f"Generating page from {from_path} to {dest_path} using {template_path}")
+    
+#     from_file = open(from_path)
+#     text = from_file.read()
+#     from_file.close()
+#     tmp_file = open(template_path)
+#     tmp = tmp_file.read()
+#     tmp_file.close()
+
+#     html_string = markdown_to_html_node(text).to_html()
+#     extract_title(text)
+#     tmp = tmp.replace("{{ Title }}", extract_title(text))
+#     tmp = tmp.replace("{{ Content }}", html_string)
+
+#     if os.path.exists(dest_path):
+#         shutil.rmtree(dest_path)
+    
+
+#     open(dest_path, 'x').write(tmp)
+
+    
+
+
 
         
 

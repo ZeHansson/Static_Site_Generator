@@ -12,6 +12,12 @@ class BlockType(Enum):
     UNORDERED_LIST = "unordered_list"
     ORDERED_LIST = "ordered_list"
 
+# def extract_title(markdown):
+#     if "#" in markdown:
+#         return markdown.strip().split("\n")[0].strip('#').strip()
+#     else:
+#         raise Exception("missing header")
+
 def markdown_to_blocks(markdown):
     lines = []
     for line in markdown.split("\n\n"):
