@@ -11,8 +11,24 @@ def extract_markdown_links(text):
 def use_regex(pattern, text):
     return re.findall(pattern,text)
 
-def split_nodes_delimiter(old_nodes, delimiter, text_type):
-    return split_nodes(old_nodes, delimiter,text_type)
+def split_nodes_delimiter(nodes, delimiter, text_type):
+    new_nodes = []
+    for node in nodes:
+        # Skip splitting if it's already processed (e.g., a CODE block)!
+        if node.text_type != TextType.TEXT:
+            new_nodes.append(node)
+            continue
+
+        # Split and convert text based on the given delimiter
+        parts = node.text.split(delimiter)
+        for i, part in enumerate(parts):
+            if not part:  # Skip empty parts
+                continue
+            if i % 2 == 0:  # Even indices are plain text
+                new_nodes.append(TextNode(part, TextType.TEXT))
+            else:  # Odd indices are styled text (e.g., code, bold, etc.)
+                new_nodes.append(TextNode(part, text_type))
+    return new_nodes
 
 def split_nodes(nodes, delimiter, text_type):
     new_nodes = []
@@ -84,28 +100,22 @@ def split_nodes_link(old_nodes):
     return split_link_nodes(old_nodes, TextType.LINK)
 
 def text_to_textnodes(text):
-    nodes = split_nodes_delimiter([TextNode(text,TextType.TEXT)],"**",TextType.BOLD)
-    nodes = split_nodes_delimiter(nodes, "_", TextType.ITALIC)
+
+    nodes = [TextNode(text, TextType.TEXT)]
+    
     nodes = split_nodes_delimiter(nodes, "`", TextType.CODE)
+    
+    nodes = split_nodes_delimiter(nodes, "**", TextType.BOLD)
+    
+    nodes = split_nodes_delimiter(nodes, "_", TextType.ITALIC)
+    
+
+
     nodes = split_nodes_link(nodes)
     nodes = split_nodes_image(nodes)
+
+
+
     return nodes
-
-
-#def split_nodes_delimiter(old_nodes, delimiter, text_type):
-#    newnodes = []
-#    for node in old_nodes:
-#        if node.text_type is not TextType.TEXT:
-#            newnodes.append(node)
-#        else:
-#            if delimiter in node.text:
-#                texts = node.text.split(delimiter)
-#                for i in range(len(texts)):
-#                    if (i+2)%2 == 1:
-#                        newnodes.append(TextNode(texts[i],text_type))
-#                    else: 
-#                        newnodes.append(TextNode(texts[i], TextType.TEXT))
-
-#    return newnodes
-               
+              
             

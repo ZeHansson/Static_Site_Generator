@@ -11,26 +11,27 @@ def generate_page(from_path, template_path, dest_path):
     
     markdown_content = get_text_from_file(from_path)
     template = get_text_from_file(template_path)
-
-    # from_file = open(from_path)
-    # text = from_file.read()
-    # from_file.close()
-    # tmp_file = open(template_path)
-    # tmp = tmp_file.read()
-    # tmp_file.close()
-
-    # html_string = markdown_to_html_node(text).to_html()
-    # extract_title(text)
-    # tmp = tmp.replace("{{ Title }}", extract_title(text))
-    # tmp = tmp.replace("{{ Content }}", html_string)
-
     html_content = use_template(template, markdown_content)
 
-    if os.path.exists(dest_path):
-        shutil.rmtree(dest_path)
-    
+    ensure_dir_exists(os.path.dirname(dest_path))
+    with open(dest_path, 'w') as f:
+        f.write(html_content)
 
-    open(dest_path, 'x').write(html_content)
+def ensure_dir_exists(dest_dir_path):
+    os.makedirs(dest_dir_path, exist_ok=True)
+
+def generate_pages_recursive(dir_path_content, template_path, dest_dir_path):
+    if os.path.isfile(dir_path_content)and dir_path_content.endswith('.md'):
+        dest_path_html = os.path.splitext(dest_dir_path)[0] + '.html'
+        generate_page(dir_path_content, template_path, dest_path_html)
+
+    elif os.path.isdir(dir_path_content):
+        ensure_dir_exists(dest_dir_path)
+        for dir in os.listdir(dir_path_content):
+            child_path = os.path.join(dir_path_content, dir)
+            generate_pages_recursive(child_path, template_path, os.path.join(dest_dir_path, dir))
+    else:
+        raise Exception(f"Invalid path: {dir_path_content}")
 
 def extract_title(markdown):
     if "#" in markdown:
@@ -39,7 +40,7 @@ def extract_title(markdown):
         raise Exception("missing header")
 
 def get_text_from_file(path):
-    file = open(path)
+    file = open(path, "r")
     text = file.read()
     file.close()
     return text

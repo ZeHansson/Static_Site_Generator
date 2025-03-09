@@ -12,40 +12,60 @@ class BlockType(Enum):
     UNORDERED_LIST = "unordered_list"
     ORDERED_LIST = "ordered_list"
 
-# def extract_title(markdown):
-#     if "#" in markdown:
-#         return markdown.strip().split("\n")[0].strip('#').strip()
-#     else:
-#         raise Exception("missing header")
-
 def markdown_to_blocks(markdown):
-    lines = []
-    for line in markdown.split("\n\n"):
-        if any(c.isalpha() for c in line):
-            temp = line
-            if "\n" in line:
-                temp = ""
-                for new in line.split("\n"):
-                    temp += f"{new.strip()}\n"
 
-            lines.append(temp.strip())
-    #returns ['# This is a heading', 'This is a paragraph of text. It has some **bold** and _italic_ words inside of it.', '- This is the first list item in a list block', '- This is a list item', '- This is another list item']
-    return lines
+    blocks = markdown.split("\n\n")
+    filtered_blocks = []
+    for block in blocks:
+        if block == "":
+            continue
+        block = block.strip()
+        filtered_blocks.append(block)
+    return filtered_blocks
 
-def block_to_block_type(markdown_block):
-    if re.match(r"^#{1,6}\s", markdown_block):
+
+def block_to_block_type(block):
+    lines = block.split("\n")
+
+    if block.startswith(("# ", "## ", "### ", "#### ", "##### ", "###### ")):
         return BlockType.HEADING
-    elif markdown_block.startswith("```") and markdown_block.endswith("```"):
+    if len(lines) > 1 and lines[0].startswith("```") and lines[-1].startswith("```"):
         return BlockType.CODE
-    elif all(re.match(r"^>", line) for line in markdown_block.splitlines()):
+    if block.startswith(">"):
+        for line in lines:
+            if not line.startswith(">"):
+                return BlockType.PARAGRAPH
         return BlockType.QUOTE
-    elif all(re.match(r"^-\s\S", line) for line in markdown_block.splitlines()):
-        # "^-\s\S|^$" allows empty lines aswell
+    if block.startswith("- "):
+        for line in lines:
+            if not line.startswith("- "):
+                return BlockType.PARAGRAPH
         return BlockType.UNORDERED_LIST
-    elif is_ordered_list(markdown_block):
+    if block.startswith("1. "):
+        i = 1
+        for line in lines:
+            if not line.startswith(f"{i}. "):
+                return BlockType.PARAGRAPH
+            i += 1
         return BlockType.ORDERED_LIST
-    else :
-        return BlockType.PARAGRAPH
+    return BlockType.PARAGRAPH
+
+# The following has issues, it does not handle code markdown in paragraph, it is probably due to either being made with elif's or bc the logic is wrong.
+
+    # if re.match(r"^#{1,6}\s", markdown_block):
+    #     return BlockType.HEADING
+    # elif markdown_block.startswith("```") and markdown_block.endswith("```"):
+    #     return BlockType.CODE
+    # elif all(re.match(r"^>", line) for line in markdown_block.splitlines()):
+    #     return BlockType.QUOTE
+    # elif all(re.match(r"^-\s\S", line) for line in markdown_block.splitlines()):
+    #     # "^-\s\S|^$" allows empty lines aswell
+    #     return BlockType.UNORDERED_LIST
+    # elif is_ordered_list(markdown_block):
+    #     return BlockType.ORDERED_LIST
+    # else :
+    #     return BlockType.PARAGRAPH
+
 
 def is_ordered_list(markdown_block):
     lines = markdown_block.splitlines()  # Split block into individual lines
